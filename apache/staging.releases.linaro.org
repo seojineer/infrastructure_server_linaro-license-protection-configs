@@ -1,0 +1,39 @@
+<VirtualHost 91.189.95.80:80>
+    Alias /static/ /srv/staging.releases.linaro.org/linaro-license-protection/static/
+    DocumentRoot /srv/staging.releases.linaro.org/www
+    ServerName staging.releases.linaro.org
+    ServerAdmin webmaster@linaro.org
+    CustomLog /var/log/apache2/staging.releases.linaro.org-access.log combined
+    ErrorLog  /var/log/apache2/staging.releases.linaro.org-error.log
+
+    <Directory /srv/staging.releases.linaro.org/linaro-license-protection/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    <Directory /srv/staging.releases.linaro.org/www>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    XSendFile on
+    XSendFilePath /srv/staging.releases.linaro.org/www
+
+    WSGIScriptAlias / /srv/staging.releases.linaro.org/configs/wsgi/wsgi_staging_releases.py
+    WSGIDaemonProcess linaro-license-protection-staging-releases
+
+    <Directory /srv/staging.releases.linaro.org/configs/wsgi>
+        <Files wsgi_staging_releases.py>
+            Order deny,allow
+            Allow from all
+        </Files>
+    </Directory>
+
+    <Directory />
+        IndexOptions NameWidth=* +SuppressDescription
+        Options +Indexes +FollowSymLinks
+        IndexIgnore favicon.ico HEADER.html
+        AllowOverride FileInfo Indexes
+    </Directory>
+
+</VirtualHost>

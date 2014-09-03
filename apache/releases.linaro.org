@@ -1,0 +1,39 @@
+<VirtualHost 91.189.95.16:80>
+    Alias /static/ /srv/releases.linaro.org/linaro-license-protection/static/
+    DocumentRoot /srv/releases.linaro.org/www
+    ServerName releases.linaro.org
+    ServerAdmin webmaster@linaro.org
+    CustomLog /var/log/apache2/releases.linaro.org-access.log combined
+    ErrorLog  /var/log/apache2/releases.linaro.org-error.log
+
+    <Directory /srv/releases.linaro.org/linaro-license-protection/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    <Directory /srv/releases.linaro.org/www>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    XSendFile on
+    XSendFilePath /srv/releases.linaro.org/www
+
+    WSGIScriptAlias / /srv/releases.linaro.org/configs/wsgi/wsgi_releases.py
+    WSGIDaemonProcess linaro-license-protection-releases
+
+    <Directory /srv/releases.linaro.org/configs/wsgi>
+        <Files wsgi_releases.py>
+            Order deny,allow
+            Allow from all
+        </Files>
+    </Directory>
+
+    <Directory />
+        IndexOptions NameWidth=* +SuppressDescription
+        Options +Indexes +FollowSymLinks
+        IndexIgnore favicon.ico HEADER.html
+        AllowOverride FileInfo Indexes
+    </Directory>
+
+</VirtualHost>

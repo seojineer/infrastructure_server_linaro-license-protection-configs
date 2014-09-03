@@ -1,0 +1,165 @@
+<VirtualHost 91.189.95.16:80 91.189.95.247:80>
+
+    Alias /static/ /srv/snapshots.linaro.org/linaro-license-protection/static/
+    DocumentRoot /srv/snapshots.linaro.org/www
+    ServerName snapshots.linaro.org
+    ServerAdmin webmaster@linaro.org
+    CustomLog /var/log/apache2/snapshots.linaro.org-access.log combined
+    ErrorLog  /var/log/apache2/snapshots.linaro.org-error.log
+
+    # SSL + OpenID for these:
+    Redirect /hwpacks https://snapshots.linaro.org/hwpacks
+    Redirect /android/~linaro-android-private https://snapshots.linaro.org/android/~linaro-android-private
+    Redirect /android/~linaro-android-restricted https://snapshots.linaro.org/android/~linaro-android-restricted
+    Redirect /precise/restricted https://snapshots.linaro.org/precise/restricted
+
+    <Directory /srv/snapshots.linaro.org/linaro-license-protection/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    <Directory /srv/snapshots.linaro.org/www>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    XSendFile on
+    XSendFilePath /srv/snapshots.linaro.org/www
+
+    WSGIScriptAlias / /srv/snapshots.linaro.org/configs/wsgi/wsgi_snapshots.py
+    WSGIDaemonProcess linaro-license-protection-snapshots
+
+    <Directory /srv/snapshots.linaro.org/configs/wsgi>
+        <Files wsgi_snapshots.py>
+            Order deny,allow
+            Allow from all
+        </Files>
+    </Directory>
+
+    <Directory />
+        IndexOptions NameWidth=* +SuppressDescription
+        Options +Indexes +FollowSymLinks
+        IndexIgnore favicon.ico HEADER.html
+        AllowOverride FileInfo Indexes
+    </Directory>
+
+</VirtualHost>
+
+<VirtualHost 91.189.95.247:443>
+
+    Alias /static/ /srv/snapshots.linaro.org/linaro-license-protection/static/
+    DocumentRoot /srv/snapshots.linaro.org/www
+    ServerName snapshots.linaro.org
+    ServerAdmin webmaster@linaro.org
+    CustomLog /var/log/apache2/snapshots.linaro.org-access.log combined
+    ErrorLog  /var/log/apache2/snapshots.linaro.org-error.log
+
+    SSLEngine On
+    SSLCertificateFile /etc/apache2/ssl/snapshots.linaro.org.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/snapshots.linaro.org.key
+    SSLCertificateChainFile /etc/apache2/ssl/gd_bundle.crt
+
+    <Directory /srv/snapshots.linaro.org/linaro-license-protection/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    <Directory /srv/snapshots.linaro.org/www>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    XSendFile on
+    XSendFilePath /srv/snapshots.linaro.org/www
+
+    WSGIScriptAlias / /srv/snapshots.linaro.org/configs/wsgi/wsgi_snapshots.py
+    WSGIDaemonProcess linaro-license-protection-snapshots-ssl
+
+    <Directory /srv/snapshots.linaro.org/configs/wsgi>
+        <Files wsgi_snapshots.py>
+            Order deny,allow
+            Allow from all
+        </Files>
+    </Directory>
+
+    <Directory />
+        IndexOptions NameWidth=* +SuppressDescription
+        Options +Indexes +FollowSymLinks
+        IndexIgnore favicon.ico HEADER.html
+        AllowOverride FileInfo Indexes
+    </Directory>
+
+    <Location "/hwpacks">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/all-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    <Location "/openid/">
+        Allow from all
+        SetHandler mod_python
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption store-type file
+        PythonOption store-directory /var/cache/apache2/openid/
+        PythonOption allowed-op-list-url "file:///etc/apache2/security/allowed-ops.txt"
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/all-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    <Location "/android/~linaro-android-restricted">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/linaro-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    <Location "/precise/restricted">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/linaro-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    Alias /hwpacks/freescale /srv/landing-teams/hwpacks/freescale
+    <Location "/hwpacks/freescale">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/freescale-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    Alias /hwpacks/samsung /srv/landing-teams/hwpacks/samsung
+    <Location "/hwpacks/samsung">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/samsung-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    Alias /hwpacks/ste /srv/landing-teams/hwpacks/ste
+    <Location "/hwpacks/ste">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/ste-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    Alias /hwpacks/ti /srv/landing-teams/hwpacks/ti
+    <Location "/hwpacks/ti">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/ti-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+    Alias /hwpacks/arm /srv/landing-teams/hwpacks/arm
+    <Location "/hwpacks/arm">
+        PythonAccessHandler apache_openid::protect
+        PythonOption handler openidteams
+        PythonOption authorized-teams-list-url "file:///etc/apache2/security/arm-private-hwpack-teams.txt"
+        PythonOption action-path "/openid/"
+    </Location>
+
+</VirtualHost>

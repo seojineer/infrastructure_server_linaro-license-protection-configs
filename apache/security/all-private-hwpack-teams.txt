@@ -1,0 +1,5 @@
+linaro-landing-team-freescale
+linaro-landing-team-samsung
+linaro-landing-team-ste
+linaro-landing-team-ti
+linaro-landing-team-arm

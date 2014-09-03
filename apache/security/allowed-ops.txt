@@ -1,0 +1,1 @@
+Ubuntu=https://login.ubuntu.com
