@@ -9,7 +9,7 @@ ROOT_URLCONF = 'urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/srv/releases.linaro.org/db/licenses.db',
+        'NAME': '/srv/releases.nexell.co.kr/db/licenses.db',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -22,5 +22,5 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, "templates" ),
     )
 
-SERVED_PATHS = ['/srv/releases.linaro.org/www']
-UPLOAD_PATH = '/srv/releases.linaro.org/uploads'
+SERVED_PATHS = ['/srv/releases.nexell.co.kr/www']
+UPLOAD_PATH = '/srv/releases.nexell.co.kr/uploads'
